@@ -1,7 +1,7 @@
 # 🐍 Pystack Week 13 - Monitorando
 
 <div align="center">
-<img src="https://github.com/MatheusGrilo/pystack-week-13/raw/main/.gitassets/logo.png" alt="Pystack Week 13 gerado por inteligência artificial" width="350" />
+<img src="https://github.com/MatheusGrilo/pystack-week-13/raw/main/.gitassets/1.png" alt="Pystack Week 13 gerado por inteligência artificial" width="350" />
 
 <div data-badges>
     <img src="https://img.shields.io/badge/python-3776AB.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
@@ -69,7 +69,7 @@ O projeto é construído com Python e Django, utilizando TailwindCSS para estili
 - Gráficos interativos para análise de dados
 - Interface estilizada com TailwindCSS
 
-![](https://github.com/MatheusGrilo/pystack-week-13/raw/main/.gitassets/1.png)
+![](https://github.com/MatheusGrilo/pystack-week-13/raw/main/.gitassets/2.png)
 
 ## 💎 Links úteis 💎
 
