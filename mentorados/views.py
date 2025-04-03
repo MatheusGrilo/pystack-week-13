@@ -1,3 +1,4 @@
+import locale
 from datetime import datetime, timedelta
 
 from django.contrib import messages
@@ -6,7 +7,7 @@ from django.shortcuts import redirect, render
 
 from mentorados.auth import valida_token
 
-from .models import DisponibilidadeHorarios, Mentorados, Navigators
+from .models import DisponibilidadeHorarios, Mentorados, Navigators, Reuniao
 
 
 def mentorados(request):
@@ -115,8 +116,40 @@ def escolher_dia(request):
         disponibilidades = DisponibilidadeHorarios.objects.filter(
             data_inicial__gte=datetime.now(), agendado=False
         ).values_list("data_inicial", flat=True)
-        horarios = []
+        locale.setlocale(locale.LC_TIME, "pt_BR.UTF-8")
+        datas = []
+        seen_dates = set()
         for i in disponibilidades:
-            horarios.append(i.date().strftime("%d-%m-%Y"))
+            formatted_date = i.date().strftime("%d-%m-%Y")
+            if formatted_date not in seen_dates:
+                seen_dates.add(formatted_date)
+                data_formatada = {
+                    "data": formatted_date,
+                    "mes": i.strftime("%B").capitalize(),
+                    "dia_da_semana": i.strftime("%A").capitalize(),
+                }
+                datas.append(data_formatada)
 
-        return render(request, "escolher_dia.html", {"horarios": list(set(horarios))})
+        return render(request, "escolher_dia.html", {"datas": datas})
+
+
+def agendar_reuniao(request):
+    if not valida_token(request.COOKIES.get("auth_token")):
+        return redirect("auth_mentorado")
+    if request.method == "GET":
+        data = request.GET.get("data")
+        data = datetime.strptime(data, "%d-%m-%Y")
+        horarios = DisponibilidadeHorarios.objects.filter(
+            data_inicial__gte=data,
+            data_inicial__lt=data + timedelta(days=1),
+            agendado=False,
+        )
+        return render(
+            request,
+            "agendar_reuniao.html",
+            {
+                "horarios": horarios,
+                "tags": Reuniao.tag_choices,
+                "data": data.date(),
+            },
+        )
