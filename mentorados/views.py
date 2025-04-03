@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
 
+from mentorados.auth import valida_token
+
 from .models import DisponibilidadeHorarios, Mentorados, Navigators
 
 
@@ -89,3 +91,32 @@ def reunioes(request):
             request, constants.SUCCESS, "Horário disponibilizado com sucesso."
         )
         return redirect("reunioes")
+
+
+def auth(request):
+    if request.method == "GET":
+        return render(request, "auth_mentorado.html")
+    else:
+        token = request.POST.get("token")
+
+        if not Mentorados.objects.filter(token=token).exists():
+            messages.add_message(request, constants.ERROR, "Token inválido")
+            return redirect("auth_mentorado")
+
+        response = redirect("escolher_dia")
+        response.set_cookie("auth_token", token, max_age=3600)
+        return response
+
+
+def escolher_dia(request):
+    if not valida_token(request.COOKIES.get("auth_token")):
+        return redirect("auth_mentorado")
+    if request.method == "GET":
+        disponibilidades = DisponibilidadeHorarios.objects.filter(
+            data_inicial__gte=datetime.now(), agendado=False
+        ).values_list("data_inicial", flat=True)
+        horarios = []
+        for i in disponibilidades:
+            horarios.append(i.date().strftime("%d-%m-%Y"))
+
+        return render(request, "escolher_dia.html", {"horarios": list(set(horarios))})

@@ -1,3 +1,4 @@
+import secrets
 from datetime import timedelta
 
 from django.contrib.auth.models import User
@@ -25,6 +26,19 @@ class Mentorados(models.Model):
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     criado_em = models.DateField(auto_now_add=True)
+    token = models.CharField(max_length=32, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = self.gerar_token_unico()
+
+        super().save(*args, **kwargs)
+
+    def gerar_token_unico(self):
+        while True:
+            token = secrets.token_urlsafe(20)
+            if not Mentorados.objects.filter(token=token).exists():
+                return token
 
     class Meta:
         verbose_name = "Mentorado"
