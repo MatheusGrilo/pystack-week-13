@@ -138,3 +138,7 @@ MESSAGE_TAGS = {
     constants.SUCCESS: "bg-green-50 text-green-700",
     constants.ERROR: "bg-red-50 text-red-700",
 }
+
+# Redirect URL after login
+LOGIN_URL = "/usuarios/login/"
+LOGIN_REDIRECT_URL = "/usuarios/login/"
