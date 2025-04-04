@@ -3,11 +3,12 @@ from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.messages import constants
+from django.http import Http404
 from django.shortcuts import redirect, render
 
 from mentorados.auth import valida_token
 
-from .models import DisponibilidadeHorarios, Mentorados, Navigators, Reuniao
+from .models import DisponibilidadeHorarios, Mentorados, Navigators, Reuniao, Tarefa
 
 
 def mentorados(request):
@@ -184,3 +185,24 @@ def agendar_reuniao(request):
             request, constants.SUCCESS, "Reunião agendada com sucesso."
         )
         return redirect("escolher_dia")
+
+
+def tarefa(request, id):
+    mentorado = Mentorados.objects.get(id=id)
+    if mentorado.user != request.user:
+        raise Http404()
+
+    if request.method == "GET":
+        tarefas = Tarefa.objects.filter(mentorado=mentorado)
+
+    else:
+        tarefa = request.POST.get("tarefa")
+        tarefa = Tarefa(mentorado=mentorado, tarefa=tarefa)
+
+        tarefa.save()
+        messages.add_message(
+            request, constants.SUCCESS, "Tarefa cadastrada com sucesso."
+        )
+        return redirect("tarefa", id=mentorado.id)
+
+    return render(request, "tarefa.html", {"mentorado": mentorado, "tarefas": tarefas})

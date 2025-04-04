@@ -131,10 +131,12 @@
                 {% for mentorado in mentorados %}
                 <tr>
                   <td class="py-4 pl-4 pr-8 sm:pl-6 lg:pl-8">
-                    <div class="flex items-center gap-x-4">
+                    <a href="{% url 'tarefa' mentorado.id %}" >
+                    <div class="flex items-center gap-x-4 hover:bg-gray-800/40 rounded-md px-2">
                       <img src="{{mentorado.foto.url}}" alt="" class="size-8 rounded-full bg-gray-800">
                       <div class="truncate text-sm/6 font-medium text-white">{{mentorado.nome}}</div>
                     </div>
+                  </a>
                   </td>
                   <td class="hidden py-4 pl-0 pr-4 sm:table-cell sm:pr-8">
                     <div class="flex gap-x-3">
