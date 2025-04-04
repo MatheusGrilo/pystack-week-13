@@ -3,8 +3,9 @@ from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.messages import constants
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 
 from mentorados.auth import valida_token
 
@@ -233,3 +234,29 @@ def upload(request, id):
     upload = Upload(mentorado=mentorado, video=video)
     upload.save()
     return redirect("tarefa", id=mentorado.id)
+
+
+def tarefa_mentorado(request):
+    mentorado = valida_token(request.COOKIES.get("auth_token"))
+    if not mentorado:
+        return redirect("auth_mentorado")
+
+    if request.method == "GET":
+        videos = Upload.objects.filter(mentorado=mentorado)
+        tarefas = Tarefa.objects.filter(mentorado=mentorado)
+        return render(
+            request,
+            "tarefa_mentorado.html",
+            {"mentorado": mentorado, "videos": videos, "tarefas": tarefas},
+        )
+
+
+@csrf_exempt
+def tarefa_alterar(request, id):
+    tarefa = Tarefa.objects.get(id=id)
+    if not tarefa:
+        raise Http404()
+
+    tarefa.realizada = not tarefa.realizada
+    tarefa.save()
+    return HttpResponse("teste")
