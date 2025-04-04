@@ -2,6 +2,7 @@ import locale
 from datetime import datetime, timedelta
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.messages import constants
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
@@ -19,9 +20,8 @@ from .models import (
 )
 
 
+@login_required
 def mentorados(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
     if request.method == "GET":
         mentorados = Mentorados.objects.filter(user=request.user)
         navigators = Navigators.objects.filter(user=request.user)
@@ -71,6 +71,7 @@ def mentorados(request):
         return redirect("mentorados")
 
 
+@login_required
 def reunioes(request):
     if request.method == "GET":
         reunioes = Reuniao.objects.filter(data__mentor=request.user)
@@ -195,6 +196,7 @@ def agendar_reuniao(request):
         return redirect("escolher_dia")
 
 
+@login_required
 def tarefa(request, id):
     mentorado = Mentorados.objects.get(id=id)
     if mentorado.user != request.user:
@@ -225,6 +227,7 @@ def tarefa(request, id):
     )
 
 
+@login_required
 def upload(request, id):
     mentorado = Mentorados.objects.get(id=id)
     if mentorado.user != request.user:
